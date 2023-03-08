@@ -74,7 +74,6 @@ void Substitute(std::string& string, const std::string& address, char change) {
     string = "";
     size_t ammount = std::count(tmp.begin(), tmp.end(), change);
     for (size_t i = 0; i < ammount; i++) {
-        std::cout << string << '\n';
         string.append(tmp.substr(0, tmp.find(change)) + address);
         tmp = tmp.substr(tmp.find(change) + 1, tmp.size() - tmp.find(change));
     }
