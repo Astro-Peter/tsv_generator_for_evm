@@ -82,7 +82,7 @@ int main() {
     std::fstream input(filename, std::fstream::in);
     std::cout << "output .tsv file:\n";
     std::cin >> filename;
-    std::fstream output(filename, std::fstream::out);
+    std::fstream output(filename, std::fstream::out | std::fstream::trunc);
     int start;
     std::string no;
     std::getline(input, no, ' ');
