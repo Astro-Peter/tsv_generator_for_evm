@@ -65,10 +65,30 @@ Command::Command(std::string& input) {
     }
 }
 
+void Substitute(std::string& string, const std::string& address){
+    std::string tmp = string;
+    string = "";
+    size_t ammount = std::count(tmp.begin(), tmp.end(), 'M');
+    for (size_t i = 0; i < ammount; i++){
+        std::cout << string << '\n';
+        string.append(tmp.substr(0, tmp.find('M')) + address);
+        tmp = tmp.substr(tmp.find('M') + 1, tmp.size() - tmp.find('M'));
+    }
+    string += tmp;
+};
+
 void Command::WriteToFile(std::fstream& output) const {
     output << commands[command_name].code << addres << '\t';
     output << command_name << ' ' << addres << '\t';
-    output << commands[command_name].description << '\n';
+    std::string tmp = commands[command_name].description;
+    if (addres.size() == 3) {
+        Substitute(tmp, addres);
+        if (addres[0] > '8'){
+            tmp += " Косвенный доступ";
+        }
+    }
+    //std::cout << tmp;
+    output << tmp << '\n';
 }
 
 int main() {
