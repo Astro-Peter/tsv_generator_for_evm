@@ -71,9 +71,17 @@ void Substitute(std::string& string, const std::string& address, char change) {
     string += tmp;
 };
 
-void Command::WriteToFile(std::fstream& output, size_t& start, size_t i) const {
-    if (command_){
-        output << std::hex << i + start << '\t';
+void Command::WriteToFile(std::fstream& output, size_t& start, size_t i, std::vector<std::string>& addresses) const {
+    std::ostringstream comm_address;
+    comm_address << std::uppercase << std::hex << start + i;
+    std::string address = comm_address.str();
+    if (address.size() == 2){
+        address = "0" + address;
+    } else if (address.size() == 1){
+        address = "00" + address;
+    }
+    if (command_ && (std::find(addresses.begin(), addresses.end(), address) != addresses.end())){
+        output << address << '\t';
         output << commands[command_name_].code_ << address_ << '\t';
         output << command_name_ << ' ' << (pointer_ ? ('(' + address_ + ')') : address_) << '\t';
         std::string tmp = commands[command_name_].description_;
@@ -89,7 +97,7 @@ void Command::WriteToFile(std::fstream& output, size_t& start, size_t i) const {
     } else if (skip_){
         start = std::stoll(address_, nullptr, 16) - i - 1;
     } else {
-        output << std::hex << i + start << '\t';
+        output << address << '\t';
         output << command_name_ << '\n';
     }
 }

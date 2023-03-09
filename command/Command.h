@@ -8,6 +8,8 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
+#include <sstream>
 #include <map>
 
 struct CodeAndDescription {
@@ -25,7 +27,7 @@ private:
     static std::map<std::string, CodeAndDescription> commands;
 public:
     explicit Command(std::string& input);
-    void WriteToFile(std::fstream& output, size_t& start, size_t i) const;
+    void WriteToFile(std::fstream& output, size_t& start, size_t i, std::vector<std::string>& addresses) const;
 };
 
 
