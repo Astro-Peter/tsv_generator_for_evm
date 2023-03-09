@@ -50,9 +50,6 @@ int main() {
         std::fstream tracing(filename, std::fstream::in);
         addresses = CheckComms(tracing, comms);
     }
-    for (auto& i : addresses) {
-        std::cout << i << '\n';
-    }
     for (size_t i = 0; i < comms.size(); i++) {
         comms[i].WriteToFile(output, start, i, addresses);
     }

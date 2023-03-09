@@ -98,6 +98,6 @@ void Command::WriteToFile(std::fstream& output, size_t& start, size_t i, std::ve
         start = std::stoll(address_, nullptr, 16) - i - 1;
     } else {
         output << address << '\t';
-        output << command_name_ << '\n';
+        output << commands[command_name_].code_ << address_ << '\n';
     }
 }
