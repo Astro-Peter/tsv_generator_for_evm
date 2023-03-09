@@ -13,11 +13,13 @@ class Command {
 public:
     std::string command_name;
     std::string addres;
+    bool command = false;
+    bool skip = false;
     bool pointer = false;
     static std::map<std::string, CodeAndDescription> commands;
 
     explicit Command(std::string& input);
-    void WriteToFile(std::fstream& output) const;
+    void WriteToFile(std::fstream& output, size_t& start, size_t i) const;
 };
 
 std::map<std::string, CodeAndDescription> Command::commands = {{"ISZ", {"0", "(M) "
@@ -58,7 +60,16 @@ std::map<std::string, CodeAndDescription> Command::commands = {{"ISZ", {"0", "(M
 Command::Command(std::string& input) {
     size_t delim = input.find(' ');
     command_name = input.substr(0, delim);
-    if (commands[command_name].code.size() < 2) {
+    if (commands.find(command_name) != commands.end()){
+        command = true;
+    } else if (command_name == "$pos") {
+        addres = input.substr(delim + 1, input.size() - delim);
+        skip = true;
+        return;
+    } else {
+        addres = command_name;
+    }
+    if (commands[command_name].code.size() <= 2) {
         addres = input.substr(delim + 1, input.size() - delim);
         if (addres.size() == 5) {
             addres = addres.substr(1, 3);
@@ -80,20 +91,27 @@ void Substitute(std::string& string, const std::string& address, char change) {
     string += tmp;
 };
 
-void Command::WriteToFile(std::fstream& output) const {
-    output << commands[command_name].code << addres << '\t';
-    output << command_name << ' ' << addres << '\t';
-    std::string tmp = commands[command_name].description;
-    if (addres.size() == 3) {
-        Substitute(tmp, addres, 'M');
-        if (pointer) {
-            tmp += " Косвенный доступ";
+void Command::WriteToFile(std::fstream& output, size_t& start, size_t i) const {
+    if (command){
+        output << std::hex << i + start << '\t';
+        output << commands[command_name].code << addres << '\t';
+        output << command_name << ' ' << (pointer ? ('(' + addres + ')') : addres) << '\t';
+        std::string tmp = commands[command_name].description;
+        if (addres.size() == 3) {
+            Substitute(tmp, addres, 'M');
+            if (pointer) {
+                tmp += " Косвенный доступ";
+            }
+        } else if (addres.size() == 2) {
+            Substitute(tmp, addres, 'B');
         }
-    } else if (addres.size() == 2) {
-        Substitute(tmp, addres, 'B');
+        output << tmp << '\n';
+    } else if (skip){
+        start = std::stoll(addres, nullptr, 16) - i - 1;
+    } else {
+        output << std::hex << i + start << '\t';
+        output << addres << '\n';
     }
-    //std::cout << tmp;
-    output << tmp << '\n';
 }
 
 int main() {
@@ -108,7 +126,7 @@ int main() {
     std::cout << "output .tsv file:\n";
     std::cin >> filename;
     std::fstream output(filename, std::fstream::out | std::fstream::trunc);
-    int start;
+    size_t start;
     std::string no;
     std::getline(input, no, ' ');
     input >> std::hex >> start;
@@ -122,8 +140,7 @@ int main() {
     }
     output << table_top;
     for (size_t i = 0; i < comms.size() - 1; i++) {
-        output << std::hex << i + start << '\t';
-        comms[i].WriteToFile(output);
+        comms[i].WriteToFile(output, start, i);
     }
     return 0;
 }
