@@ -16,20 +16,18 @@ int main() {
     std::cout << "output .tsv file:\n";
     std::cin >> filename;
     std::fstream output(filename, std::fstream::out | std::fstream::trunc);
-    size_t start;
-    std::string no;
-    std::getline(input, no, ' ');
-    input >> std::hex >> start;
-    input.ignore(1);
     std::vector<Command> comms;
     while (input.good()) {
         std::string tmp;
         std::getline(input, tmp, '\n');
-        Command comm(tmp);
-        comms.push_back(comm);
+        if (!tmp.empty()){
+            Command comm(tmp);
+            comms.push_back(comm);
+        }
     }
     output << table_top;
-    for (size_t i = 0; i < comms.size() - 1; i++) {
+    size_t start = 0;
+    for (size_t i = 0; i < comms.size(); i++) {
         comms[i].WriteToFile(output, start, i);
     }
     return 0;
