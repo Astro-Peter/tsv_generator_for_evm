@@ -80,7 +80,7 @@ void Command::WriteToFile(std::fstream& output, size_t& start, size_t i, std::ve
     } else if (address.size() == 1){
         address = "00" + address;
     }
-    if (command_ && (std::find(addresses.begin(), addresses.end(), address) != addresses.end())){
+    if (command_ && (std::find(addresses.begin(), addresses.end(), address) != addresses.end() || addresses.empty())){
         output << address << '\t';
         output << commands[command_name_].code_ << address_ << '\t';
         output << command_name_ << ' ' << (pointer_ ? ('(' + address_ + ')') : address_) << '\t';
